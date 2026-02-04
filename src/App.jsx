@@ -79,7 +79,7 @@ const projectsData = [
     },
     {
         id: 3,
-        title: "WADA Distributed Service",
+        title: "WADA (World Anti-Doping Agency) Distributed Service",
         desc: "Designed a globally accessible, GDPR-compliant distributed system for athlete tracking. Leveraged Kubernetes and Docker for auto-scaling to support 10,000+ concurrent users.",
         tech: ["Kubernetes", "Docker", "AWS EC2", "System Design"],
         image: "/project3.jpg",
@@ -151,6 +151,7 @@ const Typewriter = ({ text, delay = 100, pauseTime = 3000, className = "" }) => 
 const Nav = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [contactModalOpen, setContactModalOpen] = useState(false);
 
     const navLinks = [
         { label: "About", href: "#about" },
@@ -158,8 +159,7 @@ const Nav = () => {
         { label: "Stack", href: "#skills" },
         { label: "Career", href: "#experience" },
         { label: "Projects", href: "#projects" },
-        { label: "Featured", href: "#featured" },
-        { label: "Contact", href: "#contact" }
+        { label: "Featured", href: "#featured" }
     ];
 
     useEffect(() => {
@@ -184,9 +184,12 @@ const Nav = () => {
                     {navLinks.map((link, idx) => (
                         <a key={idx} href={link.href} className="text-sm font-semibold text-slate-400 hover:text-white transition-colors">{link.label}</a>
                     ))}
-                    <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-5 py-2 text-sm font-bold text-[#020617] bg-white rounded-full hover:bg-cyan-400 transition-all shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-                        <FileText size={16} /> CV
-                    </a>
+                    <button
+                        onClick={() => setContactModalOpen(true)}
+                        className="text-sm font-semibold text-slate-400 hover:text-white transition-colors"
+                    >
+                        Contact
+                    </button>
                 </div>
                 <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden text-slate-300">
                     {mobileMenuOpen ? <X /> : <Menu />}
@@ -199,9 +202,99 @@ const Nav = () => {
                             {navLinks.map((link, idx) => (
                                 <a key={idx} href={link.href} onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-cyan-400 font-semibold">{link.label}</a>
                             ))}
-                            <a href="/resume.pdf" target="_blank" className="text-cyan-400 font-bold">Download CV</a>
+                            <button
+                                onClick={() => { setContactModalOpen(true); setMobileMenuOpen(false); }}
+                                className="text-left text-slate-300 hover:text-cyan-400 font-semibold"
+                            >
+                                Contact
+                            </button>
                         </div>
                     </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Contact Modal */}
+            <AnimatePresence>
+                {contactModalOpen && (
+                    <>
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setContactModalOpen(false)}
+                            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100]"
+                        />
+
+                        {/* Modal */}
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[101] w-full max-w-md"
+                        >
+                            <div className="bg-gradient-to-b from-slate-900 to-[#020617] border border-cyan-500/30 rounded-3xl p-8 shadow-2xl relative">
+                                <button
+                                    onClick={() => setContactModalOpen(false)}
+                                    className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+                                >
+                                    <X size={24} />
+                                </button>
+
+                                <h3 className="text-3xl font-extrabold text-white mb-6 tracking-tight">
+                                    Let's <span className="text-cyan-400">Connect</span>
+                                </h3>
+
+                                <div className="space-y-4">
+                                    <a
+                                        href="https://www.linkedin.com/in/ashiqur-rahman-ire"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-4 p-4 bg-slate-800 hover:bg-cyan-600 rounded-2xl transition-all group"
+                                    >
+                                        <div className="p-3 bg-blue-500/10 rounded-xl group-hover:bg-blue-500/20 transition-colors">
+                                            <Linkedin className="text-blue-400" size={28} />
+                                        </div>
+                                        <div className="flex-grow">
+                                            <h4 className="text-white font-bold">LinkedIn</h4>
+                                            <p className="text-slate-400 text-sm">Connect with me</p>
+                                        </div>
+                                        <ExternalLink className="text-slate-500 group-hover:text-white transition-colors" size={20} />
+                                    </a>
+
+                                    <a
+                                        href="/resume.pdf"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-4 p-4 bg-slate-800 hover:bg-purple-600 rounded-2xl transition-all group"
+                                    >
+                                        <div className="p-3 bg-purple-500/10 rounded-xl group-hover:bg-purple-500/20 transition-colors">
+                                            <FileText className="text-purple-400" size={28} />
+                                        </div>
+                                        <div className="flex-grow">
+                                            <h4 className="text-white font-bold">Download CV</h4>
+                                            <p className="text-slate-400 text-sm">View my resume</p>
+                                        </div>
+                                        <ExternalLink className="text-slate-500 group-hover:text-white transition-colors" size={20} />
+                                    </a>
+
+                                    <a
+                                        href="mailto:ashiqurrahman09.jobs@gmail.com"
+                                        className="flex items-center gap-4 p-4 bg-slate-800 hover:bg-pink-600 rounded-2xl transition-all group"
+                                    >
+                                        <div className="p-3 bg-pink-500/10 rounded-xl group-hover:bg-pink-500/20 transition-colors">
+                                            <Mail className="text-pink-400" size={28} />
+                                        </div>
+                                        <div className="flex-grow">
+                                            <h4 className="text-white font-bold">Email Me</h4>
+                                            <p className="text-slate-400 text-sm">Send a message</p>
+                                        </div>
+                                        <ExternalLink className="text-slate-500 group-hover:text-white transition-colors" size={20} />
+                                    </a>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </>
                 )}
             </AnimatePresence>
         </nav>
@@ -215,18 +308,13 @@ const HeroSection = () => (
             {/* Left Column: Text Content */}
             <div className="text-center md:text-left order-2 md:order-1">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap justify-center md:justify-start gap-3 mb-8">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-900/30 border border-cyan-500/30 text-cyan-300 text-xs font-bold tracking-wide uppercase backdrop-blur-sm shadow-sm"><CheckCircle size={12} /> Holding Stamp 1G Graduate Visa</span>
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/50 border border-slate-600/30 text-slate-300 text-xs font-bold tracking-wide uppercase backdrop-blur-sm"><MapPin size={12} /> Based in Dublin</span>
                 </motion.div>
                 
-                <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold text-white mb-6 tracking-tighter leading-[0.9]">
+                <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold text-white mb-8 tracking-tighter leading-[0.9]">
                     Ashiqur <br /> Rahman.
                 </h1>
-                
-                <h2 className="text-2xl md:text-3xl text-slate-300 font-medium mb-6 tracking-tight">
-                    Graduate Software Engineer
-                </h2>
-                
+
                 <p className="text-lg text-slate-400 max-w-lg mx-auto md:mx-0 leading-relaxed mb-10">
                     Architecting robust, scalable applications by bridging backend logic with modern infrastructure and intuitive front-end designs.
                 </p>
@@ -278,9 +366,7 @@ const AboutSection = () => (
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {[
-                    { label: "Level 9 MSc", sub: "Trinity College Dublin" }, 
-                    { label: "Stamp 1G", sub: "Graduate Visa Holder" }, 
-                    { label: "Web3 & IoT", sub: "Open Source Contributor" }, 
+                    { label: "Level 9 MSc", sub: "Trinity College Dublin" },
                     { label: "Open to Work", sub: "Hybrid / On-site Dublin" }
                 ].map((stat, idx) => (
                     <div key={idx} className="p-8 rounded-3xl bg-slate-900/50 border border-slate-800 hover:border-cyan-500/30 transition-all hover:-translate-y-1">
@@ -651,37 +737,154 @@ const FeaturedPostsSection = () => (
 
 const FooterCTA = () => (
     <section id="contact" className="py-32 px-6">
-        <div className="max-w-5xl mx-auto">
-            <div className="relative rounded-[3rem] bg-gradient-to-b from-slate-900 to-[#020617] border border-slate-800 overflow-hidden p-12 md:p-24 text-center">
-                
-                {/* Glow Effects */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1/2 bg-cyan-500/10 blur-[100px] pointer-events-none" />
-                
-                <h2 className="relative z-10 text-4xl md:text-6xl font-extrabold text-white mb-8 tracking-tighter">
-                    Let's Build Something <br className="hidden md:block" /> <span className="text-cyan-400">Exceptional.</span>
-                </h2>
-                
-                <p className="relative z-10 text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-12">
-                    I'm currently available for full-time roles. If you're looking for a developer who understands both the hardware and software side of things, let's talk.
-                </p>
-                
-                <div className="relative z-10 flex flex-col sm:flex-row justify-center gap-4">
-                    <a href="mailto:ashiqurrahman09.jobs@gmail.com" className="inline-flex justify-center items-center gap-2 bg-white text-[#020617] px-8 py-4 rounded-full font-bold text-lg hover:scale-105 transition-all shadow-[0_0_30px_rgba(255,255,255,0.2)]">
-                        <Mail size={20} /> Say Hello
-                    </a>
-                    <div className="flex justify-center gap-4">
-                        <a href="https://www.linkedin.com/in/ashiqur-rahman-ire" target="_blank" className="p-4 bg-slate-800 rounded-full text-white hover:bg-cyan-600 transition-all">
-                            <Linkedin size={24} />
-                        </a>
-                        <a href="https://github.com/Ashiqurrahman9753" target="_blank" className="p-4 bg-slate-800 rounded-full text-white hover:bg-slate-700 transition-all">
-                            <Github size={24} />
-                        </a>
-                    </div>
+        <div className="max-w-7xl mx-auto space-y-16">
+
+            {/* Why Me - Value Proposition */}
+            <div className="grid lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-3 text-center mb-8">
+                    <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">
+                        Why <span className="text-cyan-400">Work With Me</span>
+                    </h2>
+                    <p className="text-slate-400 text-lg max-w-3xl mx-auto">
+                        I bring a unique perspective that combines hardware fundamentals with modern software architecture.
+                    </p>
                 </div>
 
-                <div className="relative z-10 mt-20 pt-10 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center text-slate-500 text-sm">
-                    <p>© 2026 Ashiqur Rahman. Crafted in Dublin.</p>
-                    <p className="mt-2 md:mt-0 font-mono">System.exit(0)</p>
+                <div className="p-8 rounded-3xl bg-gradient-to-br from-cyan-900/20 to-slate-900/50 border border-cyan-500/20 hover:border-cyan-500/40 transition-all">
+                    <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 flex items-center justify-center mb-6">
+                        <Zap className="text-cyan-400" size={28} />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-3">Fast Learner</h3>
+                    <p className="text-slate-400 leading-relaxed">
+                        Transitioned from electronics to software engineering, mastering full-stack development, network systems, and cloud infrastructure in record time.
+                    </p>
+                </div>
+
+                <div className="p-8 rounded-3xl bg-gradient-to-br from-purple-900/20 to-slate-900/50 border border-purple-500/20 hover:border-purple-500/40 transition-all">
+                    <div className="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center mb-6">
+                        <Server className="text-purple-400" size={28} />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-3">Systems Thinker</h3>
+                    <p className="text-slate-400 leading-relaxed">
+                        I don't just write code—I architect solutions. My electronics background helps me optimize at both hardware and software levels.
+                    </p>
+                </div>
+
+                <div className="p-8 rounded-3xl bg-gradient-to-br from-pink-900/20 to-slate-900/50 border border-pink-500/20 hover:border-pink-500/40 transition-all">
+                    <div className="w-14 h-14 rounded-2xl bg-pink-500/10 flex items-center justify-center mb-6">
+                        <HeartHandshake className="text-pink-400" size={28} />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-3">Team Player</h3>
+                    <p className="text-slate-400 leading-relaxed">
+                        Led technical initiatives in community projects and collaborated on research publications. I thrive in cross-functional teams.
+                    </p>
+                </div>
+            </div>
+
+            {/* What I Solve - Problem Statement */}
+            <div className="relative rounded-[3rem] bg-gradient-to-b from-slate-900/80 to-[#020617] border border-slate-800 overflow-hidden p-12 md:p-16">
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-purple-500/5" />
+
+                <div className="relative z-10 max-w-4xl mx-auto">
+                    <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-8 tracking-tight text-center">
+                        Problems I <span className="text-cyan-400">Solve</span>
+                    </h2>
+
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <div className="flex gap-4">
+                            <div className="flex-shrink-0">
+                                <div className="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+                                    <CheckCircle className="text-cyan-400" size={20} />
+                                </div>
+                            </div>
+                            <div>
+                                <h4 className="text-lg font-bold text-white mb-2">Legacy System Modernization</h4>
+                                <p className="text-slate-400 text-sm leading-relaxed">
+                                    Bridging old infrastructure with modern tech stacks without disrupting operations.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <div className="flex-shrink-0">
+                                <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                                    <CheckCircle className="text-purple-400" size={20} />
+                                </div>
+                            </div>
+                            <div>
+                                <h4 className="text-lg font-bold text-white mb-2">Network Performance Issues</h4>
+                                <p className="text-slate-400 text-sm leading-relaxed">
+                                    Optimizing distributed systems and resolving bottlenecks with network-level insights.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <div className="flex-shrink-0">
+                                <div className="w-10 h-10 rounded-lg bg-pink-500/10 flex items-center justify-center">
+                                    <CheckCircle className="text-pink-400" size={20} />
+                                </div>
+                            </div>
+                            <div>
+                                <h4 className="text-lg font-bold text-white mb-2">Scalability Challenges</h4>
+                                <p className="text-slate-400 text-sm leading-relaxed">
+                                    Designing systems that grow with your business, from startup MVP to enterprise scale.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <div className="flex-shrink-0">
+                                <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
+                                    <CheckCircle className="text-orange-400" size={20} />
+                                </div>
+                            </div>
+                            <div>
+                                <h4 className="text-lg font-bold text-white mb-2">Full-Stack Integration</h4>
+                                <p className="text-slate-400 text-sm leading-relaxed">
+                                    Seamlessly connecting frontend experiences with robust backend architectures.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Let's Connect - CTA */}
+            <div className="relative rounded-[3rem] bg-gradient-to-b from-cyan-900/20 to-slate-900/50 border border-cyan-500/30 overflow-hidden p-12 md:p-16 text-center">
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10" />
+
+                <div className="relative z-10">
+                    <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">
+                        Let's <span className="text-cyan-400">Connect</span>
+                    </h2>
+
+                    <p className="text-slate-300 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+                        Currently seeking full-time opportunities in Dublin or remote-hybrid roles.
+                    </p>
+
+                    <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
+                        <a href="mailto:ashiqurrahman09.jobs@gmail.com" className="inline-flex justify-center items-center gap-2 bg-white text-[#020617] px-8 py-4 rounded-full font-bold text-lg hover:scale-105 transition-all shadow-[0_0_30px_rgba(255,255,255,0.3)]">
+                            <Mail size={20} /> Get In Touch
+                        </a>
+                        <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="inline-flex justify-center items-center gap-2 bg-slate-800 hover:bg-cyan-600 text-white px-8 py-4 rounded-full font-bold text-lg transition-all border border-slate-700">
+                            <FileText size={20} /> Download CV
+                        </a>
+                    </div>
+
+                    <div className="flex justify-center gap-4 mb-12">
+                        <a href="https://www.linkedin.com/in/ashiqur-rahman-ire" target="_blank" className="p-4 bg-slate-800 rounded-full text-white hover:bg-cyan-600 transition-all group">
+                            <Linkedin size={24} className="group-hover:scale-110 transition-transform" />
+                        </a>
+                        <a href="https://github.com/Ashiqurrahman9753" target="_blank" className="p-4 bg-slate-800 rounded-full text-white hover:bg-slate-700 transition-all group">
+                            <Github size={24} className="group-hover:scale-110 transition-transform" />
+                        </a>
+                    </div>
+
+                    <div className="pt-8 border-t border-slate-700/50 flex flex-col md:flex-row justify-between items-center text-slate-500 text-sm gap-4">
+                        <p>© 2026 Ashiqur Rahman · Crafted with precision in Dublin, Ireland</p>
+                        <p className="font-mono text-cyan-400/60">{'</>'} Built with React + Vite</p>
+                    </div>
                 </div>
             </div>
         </div>

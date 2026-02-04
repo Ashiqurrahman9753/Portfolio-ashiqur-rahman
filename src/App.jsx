@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { Menu, X, ArrowRight, CheckCircle, Zap, Server, Code, Database, Mail, Linkedin, Github, FileText, BookOpen, GraduationCap, HeartHandshake, Megaphone, ExternalLink, Briefcase, MapPin, Copy } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -154,12 +155,11 @@ const Nav = () => {
     const [contactModalOpen, setContactModalOpen] = useState(false);
 
     const navLinks = [
-        { label: "About", href: "#about" },
-        { label: "Education", href: "#education" },
-        { label: "Stack", href: "#skills" },
-        { label: "Career", href: "#experience" },
-        { label: "Projects", href: "#projects" },
-        { label: "Featured", href: "#featured" }
+        { label: "About", href: "#about", isInternal: true },
+        { label: "Education", href: "#education", isInternal: true },
+        { label: "Stack", href: "#skills", isInternal: true },
+        { label: "Career", href: "#experience", isInternal: true },
+        { label: "Featured", href: "#featured", isInternal: true }
     ];
 
     useEffect(() => {
@@ -184,11 +184,14 @@ const Nav = () => {
                     {navLinks.map((link, idx) => (
                         <a key={idx} href={link.href} className="text-sm font-semibold text-slate-400 hover:text-white transition-colors">{link.label}</a>
                     ))}
+                    <Link to="/projects" className="text-sm font-semibold text-slate-400 hover:text-white transition-colors">
+                        Projects
+                    </Link>
                     <button
                         onClick={() => setContactModalOpen(true)}
-                        className="text-sm font-semibold text-slate-400 hover:text-white transition-colors"
+                        className="flex items-center gap-2 px-5 py-2 text-sm font-bold text-[#020617] bg-white rounded-full hover:bg-cyan-400 transition-all shadow-[0_0_15px_rgba(255,255,255,0.2)]"
                     >
-                        Contact
+                        <Mail size={16} /> Contact
                     </button>
                 </div>
                 <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden text-slate-300">
@@ -202,6 +205,9 @@ const Nav = () => {
                             {navLinks.map((link, idx) => (
                                 <a key={idx} href={link.href} onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-cyan-400 font-semibold">{link.label}</a>
                             ))}
+                            <Link to="/projects" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-cyan-400 font-semibold">
+                                Projects
+                            </Link>
                             <button
                                 onClick={() => { setContactModalOpen(true); setMobileMenuOpen(false); }}
                                 className="text-left text-slate-300 hover:text-cyan-400 font-semibold"
@@ -892,10 +898,94 @@ const FooterCTA = () => (
 );
 
 
+// --- PAGE COMPONENTS ---
+
+const HomePage = () => (
+    <>
+        <HeroSection />
+        <AboutSection />
+        <EducationSection />
+        <ExperienceSection />
+        <CommunityImpactSection />
+        <FeaturedPostsSection />
+        <FooterCTA />
+    </>
+);
+
+const ProjectsPage = () => (
+    <div className="pt-32 pb-16">
+        <div className="max-w-7xl mx-auto px-6">
+            <div className="mb-16">
+                <Link to="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-cyan-400 transition-colors mb-8">
+                    <ArrowRight size={20} className="rotate-180" /> Back to Home
+                </Link>
+                <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-6 tracking-tight">
+                    All <span className="text-cyan-400">Projects</span>
+                </h1>
+                <p className="text-xl text-slate-400 max-w-3xl">
+                    A collection of my work spanning IoT, distributed systems, machine learning, and full-stack development.
+                </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {projectsData.map((project) => (
+                    <motion.div
+                        key={project.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        whileHover={{ y: -10 }}
+                        className={`group rounded-3xl bg-[#020617] border border-slate-800 overflow-hidden flex flex-col ${project.image === "" ? 'border-dashed border-slate-700' : 'hover:border-slate-600'} transition-all duration-300`}
+                    >
+                        {project.image ? (
+                            <div className="h-56 bg-slate-900 relative overflow-hidden">
+                                 <div
+                                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
+                                    style={{ backgroundImage: `url(${project.image})` }}
+                                 />
+                                 <div className="absolute inset-0 bg-gradient-to-t from-[#020617] to-transparent" />
+                            </div>
+                        ) : (
+                            <div className="h-56 bg-slate-900/30 flex items-center justify-center text-slate-600 border-b border-slate-800">
+                                <span className="font-mono text-sm tracking-widest uppercase">Coming Soon</span>
+                            </div>
+                        )}
+
+                        <div className="p-8 flex flex-col flex-grow">
+                            <div className="flex justify-between items-start mb-4">
+                                <h3 className="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors leading-tight">
+                                    {project.title}
+                                </h3>
+                                {project.repo !== "#" && (
+                                    <a href={project.repo} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-white transition-colors">
+                                        <Github size={20} />
+                                    </a>
+                                )}
+                            </div>
+
+                            <p className="text-slate-400 mb-8 line-clamp-3 text-sm leading-relaxed">
+                                {project.desc}
+                            </p>
+
+                            <div className="mt-auto flex flex-wrap gap-2">
+                                {project.tech.map((t, i) => (
+                                    <span key={i} className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md bg-slate-800 text-slate-300">
+                                        {t}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+        </div>
+    </div>
+);
+
 // --- MAIN APP COMPONENT ---
 
 function App() {
   return (
+    <Router>
     <div className="min-h-screen bg-[#020617] text-slate-200 font-sans selection:bg-cyan-500/30">
         
         {/* FONT IMPORT - INTER */}
@@ -917,16 +1007,13 @@ function App() {
 
         <div className="relative z-10">
             <Nav />
-            <HeroSection />
-            <AboutSection />
-            <EducationSection />
-            <ExperienceSection />
-            <CommunityImpactSection />
-            <ProjectsSection />
-            <FeaturedPostsSection />
-            <FooterCTA />
+            <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/projects" element={<ProjectsPage />} />
+            </Routes>
         </div>
     </div>
+    </Router>
   );
 }
 

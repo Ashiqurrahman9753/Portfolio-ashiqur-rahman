@@ -158,6 +158,7 @@ const Nav = () => {
         { label: "Stack", href: "#skills" },
         { label: "Career", href: "#experience" },
         { label: "Projects", href: "#projects" },
+        { label: "Featured", href: "#featured" },
         { label: "Contact", href: "#contact" }
     ];
 
@@ -403,24 +404,19 @@ const CommunityImpactSection = () => (
                     </div>
                 </div>
 
-                <div className="lg:col-span-2 flex flex-col gap-6">
-                    <div className="p-8 rounded-[2rem] bg-[#020617] border border-slate-800 hover:border-cyan-500/30 transition-all flex-1">
+                <div className="lg:col-span-2">
+                    <div className="p-8 rounded-[2rem] bg-[#020617] border border-slate-800 hover:border-cyan-500/30 transition-all h-full">
                         <div className="flex items-center gap-3 mb-4">
                             <Megaphone className="text-cyan-400" size={24} />
                              <h3 className="text-xl font-bold text-white">Annette Secretary</h3>
                         </div>
-                        <p className="text-slate-400 leading-relaxed">
+                        <p className="text-slate-400 leading-relaxed mb-4">
                             Coordinated social service initiatives with the District Annette's Club. Launched community engagement programs supported by Rotary International.
                         </p>
+                        <a href="#featured" className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 text-sm font-semibold transition-colors">
+                            View Featured Article <ArrowRight size={16} />
+                        </a>
                     </div>
-                    
-                    <a href="https://rotarynewsonline.org/striking-a-chord-with-annets/" target="_blank" rel="noopener noreferrer" className="p-8 rounded-[2rem] bg-purple-900/10 border border-purple-500/20 hover:bg-purple-900/20 transition-all group flex items-center justify-between">
-                         <div>
-                             <h4 className="text-lg font-bold text-white group-hover:text-purple-300 transition-colors">Read Article</h4>
-                             <p className="text-purple-300/60 text-sm">Rotary News Online</p>
-                         </div>
-                         <ExternalLink className="text-purple-400" size={20} />
-                    </a>
                 </div>
             </div>
         </div>
@@ -481,6 +477,173 @@ const ProjectsSection = () => (
                         </div>
                     </motion.div>
                 ))}
+            </div>
+        </div>
+    </section>
+);
+
+const FeaturedPostsSection = () => (
+    <section id="featured" className="py-32 px-6 bg-slate-900/30">
+        <div className="max-w-6xl mx-auto">
+            <h2 className="text-4xl font-extrabold text-white mb-16 tracking-tight flex items-center gap-4">
+                <Megaphone className="text-cyan-400" size={36} /> Featured Posts & Publications
+            </h2>
+
+            <div className="grid md:grid-cols-1 gap-8">
+                {/* LinkedIn Post - IPL Analysis */}
+                <motion.a
+                    href="https://www.linkedin.com/posts/ashiqur-rahman-ire_whistlepodu-ipl2024-cskvrcb-activity-7311227809648037889-EGiM"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ y: -5 }}
+                    className="group relative rounded-3xl bg-gradient-to-br from-slate-900 to-[#020617] border border-slate-800 hover:border-cyan-500/50 overflow-hidden p-8 md:p-12 transition-all duration-300"
+                >
+                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                    <div className="relative z-10 flex flex-col md:flex-row gap-8 items-start">
+                        <div className="flex-shrink-0">
+                            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center shadow-xl">
+                                <BookOpen className="text-white" size={32} />
+                            </div>
+                        </div>
+
+                        <div className="flex-grow">
+                            <div className="flex items-center gap-3 mb-4">
+                                <span className="px-3 py-1 rounded-full bg-cyan-900/30 border border-cyan-500/30 text-cyan-300 text-xs font-bold uppercase tracking-wide">
+                                    Community Recognition
+                                </span>
+                                <Linkedin className="text-blue-400" size={20} />
+                            </div>
+
+                            <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 group-hover:text-cyan-400 transition-colors leading-tight">
+                                IPL 2024 Analysis: CSK vs RCB Strategic Breakdown
+                            </h3>
+
+                            <p className="text-slate-400 text-lg leading-relaxed mb-6">
+                                Shared an in-depth analysis of cricket strategy and data insights during IPL 2024.
+                                This post received appreciation from <span className="text-white font-semibold">Ira Akers</span>,
+                                Co-Founder of <span className="text-cyan-400 font-semibold">CUE</span>, highlighting the intersection of sports analytics and technology.
+                            </p>
+
+                            <div className="flex items-center gap-4 text-sm text-slate-500">
+                                <span className="flex items-center gap-2">
+                                    <HeartHandshake size={16} className="text-pink-400" />
+                                    Recognized by Industry Leaders
+                                </span>
+                                <span className="flex items-center gap-2">
+                                    <ExternalLink size={16} className="text-cyan-400" />
+                                    View on LinkedIn
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </motion.a>
+
+                {/* Academic Publication - ICREACT 2023 */}
+                <motion.div
+                    whileHover={{ y: -5 }}
+                    className="group relative rounded-3xl bg-gradient-to-br from-slate-900 to-[#020617] border border-slate-800 hover:border-purple-500/50 overflow-hidden p-8 md:p-12 transition-all duration-300"
+                >
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                    <div className="relative z-10 flex flex-col md:flex-row gap-8 items-start">
+                        <div className="flex-shrink-0">
+                            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-xl">
+                                <GraduationCap className="text-white" size={32} />
+                            </div>
+                        </div>
+
+                        <div className="flex-grow">
+                            <div className="flex items-center gap-3 mb-4">
+                                <span className="px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-bold uppercase tracking-wide">
+                                    Academic Publication
+                                </span>
+                                <span className="text-xs text-slate-500 font-mono">Jan 2023 - May 2023</span>
+                            </div>
+
+                            <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 group-hover:text-purple-400 transition-colors leading-tight">
+                                Event Analysis of Brain Signals Using Machine & Deep Learning
+                            </h3>
+
+                            <p className="text-slate-400 text-lg leading-relaxed mb-6">
+                                Bachelor's final year thesis published in <span className="text-white font-semibold">ICREACT 2023</span> (International Conference in Research in Electronics Engineering and Communication Techniques).
+                                Focused on classifying brain events for cognitive processes with applications in brain-computer interfaces, neuroscience, and clinical diagnosis.
+                                <span className="block mt-2 text-purple-400 font-medium">Associated with SRM IST Vadapalani Campus</span>
+                            </p>
+
+                            <div className="flex flex-wrap gap-2 mb-4">
+                                <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-md bg-slate-800 text-slate-300">
+                                    Logistic Regression
+                                </span>
+                                <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-md bg-slate-800 text-slate-300">
+                                    Deep Learning
+                                </span>
+                                <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-md bg-slate-800 text-slate-300">
+                                    EEG Analysis
+                                </span>
+                            </div>
+
+                            <div className="flex items-center gap-4 text-sm text-slate-500">
+                                <span className="flex items-center gap-2">
+                                    <CheckCircle size={16} className="text-purple-400" />
+                                    Conference Presentation
+                                </span>
+                                <span className="flex items-center gap-2">
+                                    <BookOpen size={16} className="text-purple-400" />
+                                    Published Research
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
+
+                {/* Rotary News Article */}
+                <motion.a
+                    href="https://rotarynewsonline.org/striking-a-chord-with-annets/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ y: -5 }}
+                    className="group relative rounded-3xl bg-gradient-to-br from-slate-900 to-[#020617] border border-slate-800 hover:border-pink-500/50 overflow-hidden p-8 md:p-12 transition-all duration-300"
+                >
+                    <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                    <div className="relative z-10 flex flex-col md:flex-row gap-8 items-start">
+                        <div className="flex-shrink-0">
+                            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-pink-500 to-orange-600 flex items-center justify-center shadow-xl">
+                                <HeartHandshake className="text-white" size={32} />
+                            </div>
+                        </div>
+
+                        <div className="flex-grow">
+                            <div className="flex items-center gap-3 mb-4">
+                                <span className="px-3 py-1 rounded-full bg-pink-900/30 border border-pink-500/30 text-pink-300 text-xs font-bold uppercase tracking-wide">
+                                    Community Leadership
+                                </span>
+                                <Megaphone className="text-pink-400" size={20} />
+                            </div>
+
+                            <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 group-hover:text-pink-400 transition-colors leading-tight">
+                                Striking a Chord with Annets
+                            </h3>
+
+                            <p className="text-slate-400 text-lg leading-relaxed mb-6">
+                                Featured article in <span className="text-white font-semibold">Rotary News Online</span> highlighting leadership role as Annette Secretary,
+                                coordinating social service initiatives with District Annette's Club and launching community engagement programs supported by Rotary International.
+                            </p>
+
+                            <div className="flex items-center gap-4 text-sm text-slate-500">
+                                <span className="flex items-center gap-2">
+                                    <HeartHandshake size={16} className="text-pink-400" />
+                                    Social Impact
+                                </span>
+                                <span className="flex items-center gap-2">
+                                    <ExternalLink size={16} className="text-pink-400" />
+                                    Read Full Article
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </motion.a>
             </div>
         </div>
     </section>
@@ -557,6 +720,7 @@ function App() {
             <ExperienceSection />
             <CommunityImpactSection />
             <ProjectsSection />
+            <FeaturedPostsSection />
             <FooterCTA />
         </div>
     </div>

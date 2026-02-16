@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { Menu, X, ArrowRight, CheckCircle, Zap, Server, Code, Database, Mail, Linkedin, Github, FileText, BookOpen, GraduationCap, HeartHandshake, Megaphone, ExternalLink, Briefcase, MapPin, Copy } from 'lucide-react';
+import { Menu, X, ArrowRight, CheckCircle, Zap, Server, Code, Database, Mail, Linkedin, Github, FileText, BookOpen, GraduationCap, HeartHandshake, Megaphone, ExternalLink, Briefcase, MapPin, Copy, Star, GitFork, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // --- DATA: EDUCATION ---
@@ -912,74 +912,190 @@ const HomePage = () => (
     </>
 );
 
-const ProjectsPage = () => (
-    <div className="pt-32 pb-16">
-        <div className="max-w-7xl mx-auto px-6">
-            <div className="mb-16">
-                <Link to="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-cyan-400 transition-colors mb-8">
-                    <ArrowRight size={20} className="rotate-180" /> Back to Home
-                </Link>
-                <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-6 tracking-tight">
-                    All <span className="text-cyan-400">Projects</span>
-                </h1>
-                <p className="text-xl text-slate-400 max-w-3xl">
-                    A collection of my work spanning IoT, distributed systems, machine learning, and full-stack development.
-                </p>
-            </div>
+const ProjectsPage = () => {
+    const [githubRepos, setGithubRepos] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {projectsData.map((project) => (
-                    <motion.div
-                        key={project.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        whileHover={{ y: -10 }}
-                        className={`group rounded-3xl bg-[#020617] border border-slate-800 overflow-hidden flex flex-col ${project.image === "" ? 'border-dashed border-slate-700' : 'hover:border-slate-600'} transition-all duration-300`}
-                    >
-                        {project.image ? (
-                            <div className="h-56 bg-slate-900 relative overflow-hidden">
-                                 <div
-                                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
-                                    style={{ backgroundImage: `url(${project.image})` }}
-                                 />
-                                 <div className="absolute inset-0 bg-gradient-to-t from-[#020617] to-transparent" />
-                            </div>
-                        ) : (
-                            <div className="h-56 bg-slate-900/30 flex items-center justify-center text-slate-600 border-b border-slate-800">
-                                <span className="font-mono text-sm tracking-widest uppercase">Coming Soon</span>
-                            </div>
-                        )}
+    useEffect(() => {
+        fetch('https://api.github.com/users/Ashiqurrahman9753/repos?sort=updated&per_page=30')
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to fetch repos');
+                return res.json();
+            })
+            .then(data => {
+                const filtered = data.filter(repo => !repo.fork);
+                setGithubRepos(filtered);
+                setLoading(false);
+            })
+            .catch(err => {
+                setError(err.message);
+                setLoading(false);
+            });
+    }, []);
 
-                        <div className="p-8 flex flex-col flex-grow">
-                            <div className="flex justify-between items-start mb-4">
-                                <h3 className="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors leading-tight">
-                                    {project.title}
-                                </h3>
-                                {project.repo !== "#" && (
-                                    <a href={project.repo} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-white transition-colors">
-                                        <Github size={20} />
-                                    </a>
+    return (
+        <div className="pt-32 pb-16">
+            <div className="max-w-7xl mx-auto px-6">
+                <div className="mb-16">
+                    <Link to="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-cyan-400 transition-colors mb-8">
+                        <ArrowRight size={20} className="rotate-180" /> Back to Home
+                    </Link>
+                    <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-6 tracking-tight">
+                        All <span className="text-cyan-400">Projects</span>
+                    </h1>
+                    <p className="text-xl text-slate-400 max-w-3xl">
+                        A collection of my work spanning IoT, distributed systems, machine learning, and full-stack development — fetched live from GitHub.
+                    </p>
+                </div>
+
+                {/* Featured / Curated Projects */}
+                <div className="mb-16">
+                    <h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+                        <Star className="text-yellow-400" size={24} /> Featured Projects
+                    </h2>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {projectsData.map((project) => (
+                            <motion.div
+                                key={project.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                whileHover={{ y: -10 }}
+                                className={`group rounded-3xl bg-[#020617] border border-slate-800 overflow-hidden flex flex-col ${project.image === "" ? 'border-dashed border-slate-700' : 'hover:border-slate-600'} transition-all duration-300`}
+                            >
+                                {project.image ? (
+                                    <div className="h-56 bg-slate-900 relative overflow-hidden">
+                                         <div
+                                            className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
+                                            style={{ backgroundImage: `url(${project.image})` }}
+                                         />
+                                         <div className="absolute inset-0 bg-gradient-to-t from-[#020617] to-transparent" />
+                                    </div>
+                                ) : (
+                                    <div className="h-56 bg-slate-900/30 flex items-center justify-center text-slate-600 border-b border-slate-800">
+                                        <span className="font-mono text-sm tracking-widest uppercase">Coming Soon</span>
+                                    </div>
                                 )}
-                            </div>
 
-                            <p className="text-slate-400 mb-8 line-clamp-3 text-sm leading-relaxed">
-                                {project.desc}
-                            </p>
+                                <div className="p-8 flex flex-col flex-grow">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <h3 className="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors leading-tight">
+                                            {project.title}
+                                        </h3>
+                                        {project.repo !== "#" && (
+                                            <a href={project.repo} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-white transition-colors">
+                                                <Github size={20} />
+                                            </a>
+                                        )}
+                                    </div>
 
-                            <div className="mt-auto flex flex-wrap gap-2">
-                                {project.tech.map((t, i) => (
-                                    <span key={i} className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md bg-slate-800 text-slate-300">
-                                        {t}
-                                    </span>
-                                ))}
-                            </div>
+                                    <p className="text-slate-400 mb-8 line-clamp-3 text-sm leading-relaxed">
+                                        {project.desc}
+                                    </p>
+
+                                    <div className="mt-auto flex flex-wrap gap-2">
+                                        {project.tech.map((t, i) => (
+                                            <span key={i} className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md bg-slate-800 text-slate-300">
+                                                {t}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* GitHub Repos - Live from API */}
+                <div>
+                    <h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+                        <Github className="text-slate-400" size={24} /> GitHub Repositories
+                    </h2>
+
+                    {loading && (
+                        <div className="flex items-center justify-center py-20">
+                            <Loader2 className="text-cyan-400 animate-spin" size={40} />
+                            <span className="ml-4 text-slate-400 text-lg">Fetching repos from GitHub...</span>
                         </div>
-                    </motion.div>
-                ))}
+                    )}
+
+                    {error && (
+                        <div className="text-center py-20">
+                            <p className="text-slate-400 text-lg mb-4">Couldn't load GitHub repos right now.</p>
+                            <p className="text-slate-500 text-sm font-mono">{error}</p>
+                        </div>
+                    )}
+
+                    {!loading && !error && (
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {githubRepos.map((repo, idx) => (
+                                <motion.a
+                                    key={repo.id}
+                                    href={repo.html_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: idx * 0.05 }}
+                                    whileHover={{ y: -5 }}
+                                    className="group p-6 rounded-2xl bg-[#020617] border border-slate-800 hover:border-cyan-500/40 transition-all duration-300 flex flex-col"
+                                >
+                                    <div className="flex items-start justify-between mb-3">
+                                        <h3 className="text-lg font-bold text-white group-hover:text-cyan-400 transition-colors leading-tight">
+                                            {repo.name.replace(/-/g, ' ').replace(/_/g, ' ')}
+                                        </h3>
+                                        <ExternalLink size={16} className="text-slate-600 group-hover:text-cyan-400 transition-colors flex-shrink-0 mt-1" />
+                                    </div>
+
+                                    <p className="text-slate-400 text-sm leading-relaxed mb-4 line-clamp-2 flex-grow">
+                                        {repo.description || 'No description available.'}
+                                    </p>
+
+                                    <div className="flex items-center gap-4 text-xs text-slate-500 mb-4">
+                                        {repo.language && (
+                                            <span className="flex items-center gap-1.5">
+                                                <span className={`w-2.5 h-2.5 rounded-full ${
+                                                    repo.language === 'Python' ? 'bg-blue-400' :
+                                                    repo.language === 'JavaScript' ? 'bg-yellow-400' :
+                                                    repo.language === 'TypeScript' ? 'bg-blue-500' :
+                                                    repo.language === 'HTML' ? 'bg-orange-400' :
+                                                    repo.language === 'CSS' ? 'bg-purple-400' :
+                                                    repo.language === 'Java' ? 'bg-red-400' :
+                                                    'bg-slate-400'
+                                                }`} />
+                                                {repo.language}
+                                            </span>
+                                        )}
+                                        {repo.stargazers_count > 0 && (
+                                            <span className="flex items-center gap-1">
+                                                <Star size={12} className="text-yellow-400" /> {repo.stargazers_count}
+                                            </span>
+                                        )}
+                                        {repo.forks_count > 0 && (
+                                            <span className="flex items-center gap-1">
+                                                <GitFork size={12} /> {repo.forks_count}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {repo.topics && repo.topics.length > 0 && (
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {repo.topics.slice(0, 4).map((topic, i) => (
+                                                <span key={i} className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md bg-cyan-900/20 text-cyan-300 border border-cyan-500/20">
+                                                    {topic}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+                                </motion.a>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 // --- MAIN APP COMPONENT ---
 

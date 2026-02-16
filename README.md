@@ -57,7 +57,7 @@ npm run preview
 
 ## Contact
 
-- **Email:** [your-email@example.com](mailto:your-email@example.com)
+- **Email:** [your-email@example.com](mailto:ashiqurrahman09.jobs@gmail.com)
 - **LinkedIn:** [linkedin.com/in/ashiqurrahman](https://linkedin.com/in/ashiqurrahman)
 - **GitHub:** [@Ashiqurrahman9753](https://github.com/Ashiqurrahman9753)
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { Menu, X, ArrowRight, CheckCircle, Zap, Server, Code, Database, Mail, Linkedin, Github, FileText, BookOpen, GraduationCap, HeartHandshake, Megaphone, ExternalLink, Briefcase, MapPin, Copy, Star, GitFork, Loader2 } from 'lucide-react';
+import { Menu, X, ArrowRight, CheckCircle, Zap, Server, Code, Database, Mail, Linkedin, Github, FileText, BookOpen, GraduationCap, HeartHandshake, Megaphone, ExternalLink, Briefcase, MapPin, Copy, Star, GitFork, Loader2, Eye, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // --- DATA: EDUCATION ---
@@ -104,6 +104,54 @@ const projectsData = [
     }
 ];
 
+// --- DATA: PUBLICATIONS ---
+const publicationsData = [
+    {
+        id: 1,
+        title: "Event Analysis of Functional Near-Infrared Spectroscopy Brain Signals Using Machine Learning and Generative Adversarial Networks",
+        authors: "Ashiqur Rahman, et al.",
+        date: "May 30, 2023",
+        conference: "ResearchGate",
+        abstract: "The findings of this study may improve the diagnosis and treatment of neurological disorders and contribute to the development of more precise and efficient brain-computer interfaces.",
+        researchGateUrl: "https://www.researchgate.net/publication/400849188_Event_Analysis_of_Functional_Near-Infrared_Spectroscopy_Brain_Signals_Using_Machine_Learning_and_Generative_Adversarial_Networks",
+        pdfUrl: "/papers/fnirs-brain-signals.pdf",
+        tags: ["Machine Learning", "Deep Learning", "Neuroscience", "GANs"]
+    },
+    {
+        id: 2,
+        title: "Real-Time Driver Drowsiness Detection System Using YOLOv5 and Haar Cascade Classifiers",
+        authors: "Ashiqur Rahman, et al.",
+        date: "May 15, 2023",
+        conference: "ResearchGate",
+        abstract: "The proposed system captures video frames through an in-vehicle camera, applies cascaded classifiers for face and eye region localization, and employs a custom-trained YOLOv5 model to classify driver states as 'awake' or 'drowsy.'",
+        researchGateUrl: "https://www.researchgate.net/publication/400849151_Real-Time_Driver_Drowsiness_Detection_System_Using_YOLOv5_and_Haar_Cascade_Classifiers",
+        pdfUrl: "/papers/driver-drowsiness-detection.pdf",
+        tags: ["Computer Vision", "YOLOv5", "Safety Systems", "Deep Learning"]
+    },
+    {
+        id: 3,
+        title: "Analysis of the Relationship Between University Strategy Plans and University Rankings",
+        authors: "Ashiqur Rahman, et al.",
+        date: "Apr 15, 2024",
+        conference: "ResearchGate",
+        abstract: "This study analyses the relationship between the strategic plans of universities and their external rankings.",
+        researchGateUrl: "https://www.researchgate.net/publication/400848876_An_Analysis_of_the_Relationship_Between_University_Strategy_Plans_and_University_Rankings",
+        pdfUrl: "/papers/university-rankings.pdf",
+        tags: ["Data Analysis", "Education", "Research"]
+    },
+    {
+        id: 4,
+        title: "AWS IoT Infrastructure: Reliability & Scalability Analysis",
+        authors: "Ashiqur Rahman, et al.",
+        date: "Mar 10, 2024",
+        conference: "ResearchGate",
+        abstract: "A technical analysis of leveraging AWS (IoT Core, Lambda) to bridge the reliability gap in smart systems.",
+        researchGateUrl: "https://www.researchgate.net/publication/400836218_Leveraging_Cloud_for_IoT_solutions_An_Analysis_of_AWS_cloud_Services_in_Smart_Pet_Guardian_Project",
+        pdfUrl: "/papers/aws-iot-analysis.pdf",
+        tags: ["AWS", "IoT", "Cloud Computing", "System Design"]
+    }
+];
+
 // --- COMPONENTS ---
 
 const CursorBlink = () => (
@@ -187,6 +235,9 @@ const Nav = () => {
                     <Link to="/projects" className="text-sm font-semibold text-slate-400 hover:text-white transition-colors">
                         Projects
                     </Link>
+                    <Link to="/publications" className="text-sm font-semibold text-slate-400 hover:text-white transition-colors">
+                        Publications
+                    </Link>
                     <button
                         onClick={() => setContactModalOpen(true)}
                         className="flex items-center gap-2 px-5 py-2 text-sm font-bold text-[#020617] bg-white rounded-full hover:bg-cyan-400 transition-all shadow-[0_0_15px_rgba(255,255,255,0.2)]"
@@ -207,6 +258,9 @@ const Nav = () => {
                             ))}
                             <Link to="/projects" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-cyan-400 font-semibold">
                                 Projects
+                            </Link>
+                            <Link to="/publications" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-cyan-400 font-semibold">
+                                Publications
                             </Link>
                             <button
                                 onClick={() => { setContactModalOpen(true); setMobileMenuOpen(false); }}
@@ -1097,6 +1151,177 @@ const ProjectsPage = () => {
     );
 };
 
+const PublicationsPage = () => {
+    const [pdfPreview, setPdfPreview] = useState(null);
+
+    return (
+        <div className="pt-32 pb-16">
+            <div className="max-w-7xl mx-auto px-6">
+                <div className="mb-16">
+                    <Link to="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-cyan-400 transition-colors mb-8">
+                        <ArrowRight size={20} className="rotate-180" /> Back to Home
+                    </Link>
+                    <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-6 tracking-tight">
+                        Research <span className="text-cyan-400">Publications</span>
+                    </h1>
+                    <p className="text-xl text-slate-400 max-w-3xl">
+                        Academic research spanning machine learning, computer vision, IoT systems, and data analysis.
+                    </p>
+                </div>
+
+                <div className="grid md:grid-cols-1 gap-8">
+                    {publicationsData.map((paper, idx) => (
+                        <motion.div
+                            key={paper.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.1 }}
+                            className="group relative rounded-3xl bg-gradient-to-br from-slate-900 to-[#020617] border border-slate-800 hover:border-purple-500/50 overflow-hidden p-8 md:p-12 transition-all duration-300"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                            <div className="relative z-10">
+                                <div className="flex items-start justify-between mb-6">
+                                    <div className="flex-grow">
+                                        <div className="flex items-center gap-3 mb-4 flex-wrap">
+                                            <span className="px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-bold uppercase tracking-wide">
+                                                Research Paper
+                                            </span>
+                                            <span className="text-xs text-slate-500 font-mono">{paper.date}</span>
+                                        </div>
+
+                                        <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 group-hover:text-purple-400 transition-colors leading-tight">
+                                            {paper.title}
+                                        </h3>
+
+                                        <p className="text-slate-400 mb-2">
+                                            <span className="font-semibold text-slate-300">Authors:</span> {paper.authors}
+                                        </p>
+                                        <p className="text-slate-400 mb-6">
+                                            <span className="font-semibold text-slate-300">Published:</span> {paper.conference}
+                                        </p>
+
+                                        <p className="text-slate-300 text-lg leading-relaxed mb-8">
+                                            {paper.abstract}
+                                        </p>
+
+                                        <div className="flex flex-wrap gap-2 mb-6">
+                                            {paper.tags.map((tag, i) => (
+                                                <span key={i} className="px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-md bg-slate-800 text-slate-300">
+                                                    {tag}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-wrap gap-4">
+                                    <button
+                                        onClick={() => setPdfPreview(paper)}
+                                        className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold transition-all group/btn"
+                                    >
+                                        <Eye size={18} className="group-hover/btn:scale-110 transition-transform" /> Preview PDF
+                                    </button>
+                                    <a
+                                        href={paper.pdfUrl}
+                                        download
+                                        className="inline-flex items-center gap-2 px-6 py-3 bg-slate-800 hover:bg-cyan-600 text-white rounded-xl font-bold transition-all"
+                                    >
+                                        <Download size={18} /> Download PDF
+                                    </a>
+                                    <a
+                                        href={paper.researchGateUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-all border border-slate-700"
+                                    >
+                                        <ExternalLink size={18} /> View on ResearchGate
+                                    </a>
+                                </div>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
+            </div>
+
+            {/* PDF Preview Modal */}
+            <AnimatePresence>
+                {pdfPreview && (
+                    <>
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setPdfPreview(null)}
+                            className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[100]"
+                        />
+
+                        {/* Modal */}
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="fixed inset-4 md:inset-8 z-[101] flex items-center justify-center"
+                        >
+                            <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full h-full flex flex-col shadow-2xl">
+                                {/* Modal Header */}
+                                <div className="flex items-center justify-between p-6 border-b border-slate-700">
+                                    <div className="flex-grow pr-4">
+                                        <h3 className="text-xl font-bold text-white line-clamp-2">
+                                            {pdfPreview.title}
+                                        </h3>
+                                        <p className="text-sm text-slate-400 mt-1">{pdfPreview.date}</p>
+                                    </div>
+                                    <button
+                                        onClick={() => setPdfPreview(null)}
+                                        className="flex-shrink-0 p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                                    >
+                                        <X size={24} />
+                                    </button>
+                                </div>
+
+                                {/* PDF Viewer */}
+                                <div className="flex-grow overflow-hidden">
+                                    <iframe
+                                        src={pdfPreview.pdfUrl}
+                                        className="w-full h-full"
+                                        title={pdfPreview.title}
+                                    />
+                                </div>
+
+                                {/* Modal Footer */}
+                                <div className="flex items-center justify-between p-6 border-t border-slate-700 bg-slate-900/50">
+                                    <p className="text-sm text-slate-400">
+                                        <span className="font-semibold text-slate-300">Tip:</span> Scroll to navigate through the paper
+                                    </p>
+                                    <div className="flex gap-3">
+                                        <a
+                                            href={pdfPreview.pdfUrl}
+                                            download
+                                            className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg font-bold text-sm transition-all"
+                                        >
+                                            <Download size={16} /> Download
+                                        </a>
+                                        <a
+                                            href={pdfPreview.researchGateUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-bold text-sm transition-all"
+                                        >
+                                            <ExternalLink size={16} /> ResearchGate
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
+
 // --- MAIN APP COMPONENT ---
 
 function App() {
@@ -1126,6 +1351,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/projects" element={<ProjectsPage />} />
+                <Route path="/publications" element={<PublicationsPage />} />
             </Routes>
         </div>
     </div>

@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { Menu, X, ArrowRight, CheckCircle, Zap, Server, Code, Database, Mail, Linkedin, Github, FileText, BookOpen, GraduationCap, HeartHandshake, Megaphone, ExternalLink, Briefcase, MapPin, Copy, Star, GitFork, Loader2, Eye, Download } from 'lucide-react';
+import { Menu, X, ArrowRight, CheckCircle, Zap, Server, Code, Database, Mail, Github, FileText, BookOpen, GraduationCap, HeartHandshake, Megaphone, ExternalLink, Briefcase, MapPin, Copy, Star, GitFork, Loader2, Calendar, Send, Rss } from 'lucide-react';
+import { Linkedin } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Document, Page, pdfjs } from 'react-pdf';
+
+// Configure PDF.js worker
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 // --- DATA: EDUCATION ---
 const educationData = [
@@ -152,6 +157,50 @@ const publicationsData = [
     }
 ];
 
+// --- DATA: BLOG / ARTICLES ---
+const blogData = [
+    {
+        id: 1,
+        title: "IPL 2024: When Cricket Meets Data Science",
+        excerpt: "Breaking down how strategic data analysis and decision-making shaped IPL 2024 outcomes — from player selection to in-game tactics. Recognised by Ira Akers, Co-Founder of CUE.",
+        date: "May 2024",
+        category: "Data Analysis",
+        tags: ["Data Science", "Cricket", "Analytics", "Sports Tech"],
+        url: "https://www.linkedin.com/in/ashiqur-rahman-ire",
+        icon: "chart"
+    },
+    {
+        id: 2,
+        title: "Event Analysis of Brain Signals Using ML & GANs",
+        excerpt: "A deep dive into fNIRS brain signal classification using machine learning models and Generative Adversarial Networks — presented at ICREACT 2023.",
+        date: "May 2023",
+        category: "Research",
+        tags: ["Machine Learning", "Neuroscience", "GANs", "BCI"],
+        url: "https://www.researchgate.net/publication/400849188",
+        icon: "brain"
+    },
+    {
+        id: 3,
+        title: "Striking a Chord with Annets — Rotary News",
+        excerpt: "A feature article published in Rotary News Online covering social impact initiatives and youth leadership programs with Rotary International's District Annette's Club.",
+        date: "2022",
+        category: "Community",
+        tags: ["Leadership", "Community Impact", "Rotary", "Social Impact"],
+        url: "https://www.linkedin.com/in/ashiqur-rahman-ire",
+        icon: "community"
+    },
+    {
+        id: 4,
+        title: "Building Resilient IoT Architectures on AWS",
+        excerpt: "Exploring design patterns for fault-tolerant IoT pipelines using AWS Lambda, DynamoDB, and IoT Core — lessons learned from the Smart Pet Guardian project.",
+        date: "2024",
+        category: "Technical",
+        tags: ["AWS", "IoT", "Cloud", "Architecture"],
+        url: "https://www.linkedin.com/in/ashiqur-rahman-ire",
+        icon: "cloud"
+    }
+];
+
 // --- COMPONENTS ---
 
 const CursorBlink = () => (
@@ -201,42 +250,99 @@ const Nav = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [contactModalOpen, setContactModalOpen] = useState(false);
+    const [scrollProgress, setScrollProgress] = useState(0);
+    const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+    const [formStatus, setFormStatus] = useState('idle'); // idle | sending | success | error
+    const navigate = useNavigate();
+
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+        setFormStatus('sending');
+        try {
+            const res = await fetch('https://formspree.io/f/YOUR_FORM_ID', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                body: JSON.stringify(formData)
+            });
+            if (res.ok) {
+                setFormStatus('success');
+                setFormData({ name: '', email: '', message: '' });
+            } else {
+                setFormStatus('error');
+            }
+        } catch {
+            setFormStatus('error');
+        }
+    };
 
     const navLinks = [
-        { label: "About", href: "#about", isInternal: true },
-        { label: "Education", href: "#education", isInternal: true },
-        { label: "Stack", href: "#skills", isInternal: true },
-        { label: "Career", href: "#experience", isInternal: true },
-        { label: "Featured", href: "#featured", isInternal: true }
+        { label: "About", href: "#about" },
+        { label: "Education", href: "#education" },
+        { label: "Stack", href: "#skills" },
+        { label: "Career", href: "#experience" },
+        { label: "Featured", href: "#featured" }
     ];
 
+    const handleSectionLink = (e, hash) => {
+        e.preventDefault();
+        const isHome = window.location.pathname === '/';
+        if (isHome) {
+            const el = document.querySelector(hash);
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            navigate('/' + hash);
+        }
+        setMobileMenuOpen(false);
+    };
+
     useEffect(() => {
-        const handleScroll = () => setIsScrolled(window.scrollY > 50);
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 50);
+            const total = document.documentElement.scrollHeight - window.innerHeight;
+            setScrollProgress(total > 0 ? (window.scrollY / total) * 100 : 0);
+        };
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // Scroll to hash after navigating to home page
+    useEffect(() => {
+        if (window.location.hash) {
+            const el = document.querySelector(window.location.hash);
+            if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 100);
+        }
     }, []);
 
     return (
         <nav className={`fixed top-0 w-full z-50 transition-all duration-300 border-b ${
             isScrolled ? 'bg-[#020617]/90 backdrop-blur-md border-slate-800' : 'bg-transparent border-transparent'
         }`}>
+            {/* Scroll Progress Bar */}
+            <div
+                className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-cyan-400 to-purple-500 transition-[width] duration-75 z-10"
+                style={{ width: `${scrollProgress}%` }}
+            />
+
             <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-                
+
                 {/* LOGO: >_ ASHIQUR RAHMAN_ */}
-                <a href="#home" className="flex items-center gap-2 font-bold text-lg tracking-tight text-white group font-mono">
+                <a href="/" className="flex items-center gap-2 font-bold text-lg tracking-tight text-white group font-mono">
                     <span className="text-cyan-400 font-extrabold">{">"}</span>
                     <Typewriter text="ASHIQUR RAHMAN" delay={100} className="tracking-wide" />
                 </a>
 
                 <div className="hidden md:flex items-center gap-8">
                     {navLinks.map((link, idx) => (
-                        <a key={idx} href={link.href} className="text-sm font-semibold text-slate-400 hover:text-white transition-colors">{link.label}</a>
+                        <a key={idx} href={link.href} onClick={(e) => handleSectionLink(e, link.href)} className="text-sm font-semibold text-slate-400 hover:text-white transition-colors">{link.label}</a>
                     ))}
                     <Link to="/projects" className="text-sm font-semibold text-slate-400 hover:text-white transition-colors">
                         Projects
                     </Link>
                     <Link to="/publications" className="text-sm font-semibold text-slate-400 hover:text-white transition-colors">
                         Publications
+                    </Link>
+                    <Link to="/blog" className="text-sm font-semibold text-slate-400 hover:text-white transition-colors">
+                        Blog
                     </Link>
                     <button
                         onClick={() => setContactModalOpen(true)}
@@ -254,13 +360,16 @@ const Nav = () => {
                     <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="md:hidden bg-[#020617] border-b border-slate-800 overflow-hidden">
                         <div className="flex flex-col p-6 gap-4">
                             {navLinks.map((link, idx) => (
-                                <a key={idx} href={link.href} onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-cyan-400 font-semibold">{link.label}</a>
+                                <a key={idx} href={link.href} onClick={(e) => handleSectionLink(e, link.href)} className="text-slate-300 hover:text-cyan-400 font-semibold">{link.label}</a>
                             ))}
                             <Link to="/projects" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-cyan-400 font-semibold">
                                 Projects
                             </Link>
                             <Link to="/publications" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-cyan-400 font-semibold">
                                 Publications
+                            </Link>
+                            <Link to="/blog" onClick={() => setMobileMenuOpen(false)} className="text-slate-300 hover:text-cyan-400 font-semibold">
+                                Blog
                             </Link>
                             <button
                                 onClick={() => { setContactModalOpen(true); setMobileMenuOpen(false); }}
@@ -305,51 +414,64 @@ const Nav = () => {
                                     Let's <span className="text-cyan-400">Connect</span>
                                 </h3>
 
-                                <div className="space-y-4">
-                                    <a
-                                        href="https://www.linkedin.com/in/ashiqur-rahman-ire"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center gap-4 p-4 bg-slate-800 hover:bg-cyan-600 rounded-2xl transition-all group"
-                                    >
-                                        <div className="p-3 bg-blue-500/10 rounded-xl group-hover:bg-blue-500/20 transition-colors">
-                                            <Linkedin className="text-blue-400" size={28} />
-                                        </div>
-                                        <div className="flex-grow">
-                                            <h4 className="text-white font-bold">LinkedIn</h4>
-                                            <p className="text-slate-400 text-sm">Connect with me</p>
-                                        </div>
-                                        <ExternalLink className="text-slate-500 group-hover:text-white transition-colors" size={20} />
-                                    </a>
+                                {/* Contact Form */}
+                                {formStatus === 'success' ? (
+                                    <div className="text-center py-8">
+                                        <CheckCircle className="text-green-400 mx-auto mb-3" size={48} />
+                                        <p className="text-white font-bold text-lg">Message sent!</p>
+                                        <p className="text-slate-400 text-sm mt-1">I'll get back to you soon.</p>
+                                        <button onClick={() => setFormStatus('idle')} className="mt-4 text-cyan-400 text-sm hover:underline">Send another</button>
+                                    </div>
+                                ) : (
+                                    <form onSubmit={handleFormSubmit} className="space-y-3 mb-5">
+                                        <input
+                                            type="text"
+                                            required
+                                            placeholder="Your name"
+                                            value={formData.name}
+                                            onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
+                                            className="w-full bg-slate-800 border border-slate-700 focus:border-cyan-500 rounded-xl px-4 py-3 text-white text-sm placeholder-slate-500 outline-none transition-colors"
+                                        />
+                                        <input
+                                            type="email"
+                                            required
+                                            placeholder="Your email"
+                                            value={formData.email}
+                                            onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
+                                            className="w-full bg-slate-800 border border-slate-700 focus:border-cyan-500 rounded-xl px-4 py-3 text-white text-sm placeholder-slate-500 outline-none transition-colors"
+                                        />
+                                        <textarea
+                                            required
+                                            rows={3}
+                                            placeholder="Your message..."
+                                            value={formData.message}
+                                            onChange={e => setFormData(p => ({ ...p, message: e.target.value }))}
+                                            className="w-full bg-slate-800 border border-slate-700 focus:border-cyan-500 rounded-xl px-4 py-3 text-white text-sm placeholder-slate-500 outline-none transition-colors resize-none"
+                                        />
+                                        {formStatus === 'error' && (
+                                            <p className="text-red-400 text-xs">Something went wrong. Try emailing directly.</p>
+                                        )}
+                                        <button
+                                            type="submit"
+                                            disabled={formStatus === 'sending'}
+                                            className="w-full flex items-center justify-center gap-2 bg-cyan-400 hover:bg-cyan-300 text-[#020617] font-bold py-3 rounded-xl transition-all disabled:opacity-60"
+                                        >
+                                            {formStatus === 'sending' ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                                            {formStatus === 'sending' ? 'Sending...' : 'Send Message'}
+                                        </button>
+                                    </form>
+                                )}
 
-                                    <a
-                                        href="/resume.pdf"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center gap-4 p-4 bg-slate-800 hover:bg-purple-600 rounded-2xl transition-all group"
-                                    >
-                                        <div className="p-3 bg-purple-500/10 rounded-xl group-hover:bg-purple-500/20 transition-colors">
-                                            <FileText className="text-purple-400" size={28} />
-                                        </div>
-                                        <div className="flex-grow">
-                                            <h4 className="text-white font-bold">Download CV</h4>
-                                            <p className="text-slate-400 text-sm">View my resume</p>
-                                        </div>
-                                        <ExternalLink className="text-slate-500 group-hover:text-white transition-colors" size={20} />
+                                {/* Quick links */}
+                                <div className="flex gap-3 pt-2 border-t border-slate-800">
+                                    <a href="https://www.linkedin.com/in/ashiqur-rahman-ire" target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 p-3 bg-slate-800 hover:bg-blue-600/30 rounded-xl transition-all text-slate-400 hover:text-white text-xs font-bold">
+                                        <Linkedin size={16} /> LinkedIn
                                     </a>
-
-                                    <a
-                                        href="mailto:ashiqurrahman09.jobs@gmail.com"
-                                        className="flex items-center gap-4 p-4 bg-slate-800 hover:bg-pink-600 rounded-2xl transition-all group"
-                                    >
-                                        <div className="p-3 bg-pink-500/10 rounded-xl group-hover:bg-pink-500/20 transition-colors">
-                                            <Mail className="text-pink-400" size={28} />
-                                        </div>
-                                        <div className="flex-grow">
-                                            <h4 className="text-white font-bold">Email Me</h4>
-                                            <p className="text-slate-400 text-sm">Send a message</p>
-                                        </div>
-                                        <ExternalLink className="text-slate-500 group-hover:text-white transition-colors" size={20} />
+                                    <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 p-3 bg-slate-800 hover:bg-purple-600/30 rounded-xl transition-all text-slate-400 hover:text-white text-xs font-bold">
+                                        <FileText size={16} /> CV
+                                    </a>
+                                    <a href="mailto:ashiqurrahman09.jobs@gmail.com" className="flex-1 flex items-center justify-center gap-2 p-3 bg-slate-800 hover:bg-pink-600/30 rounded-xl transition-all text-slate-400 hover:text-white text-xs font-bold">
+                                        <Mail size={16} /> Email
                                     </a>
                                 </div>
                             </div>
@@ -425,15 +547,24 @@ const AboutSection = () => (
                 </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {[
-                    { label: "Level 9 MSc", sub: "Trinity College Dublin" },
-                    { label: "Open to Work", sub: "Hybrid / On-site Dublin" }
-                ].map((stat, idx) => (
-                    <div key={idx} className="p-8 rounded-3xl bg-slate-900/50 border border-slate-800 hover:border-cyan-500/30 transition-all hover:-translate-y-1">
-                        <h3 className="text-xl font-bold text-white mb-2">{stat.label}</h3>
-                        <p className="text-sm font-mono text-slate-400">{stat.sub}</p>
+                {/* Level 9 MSc card */}
+                <div className="p-8 rounded-3xl bg-slate-900/50 border border-slate-800 hover:border-cyan-500/30 transition-all hover:-translate-y-1">
+                    <h3 className="text-xl font-bold text-white mb-2">Level 9 MSc</h3>
+                    <p className="text-sm font-mono text-slate-400">Trinity College Dublin</p>
+                </div>
+                {/* Open to Work card with pulse */}
+                <div className="relative p-8 rounded-3xl bg-slate-900/50 border border-green-500/40 hover:border-green-400/60 transition-all hover:-translate-y-1 overflow-hidden">
+                    {/* Pulsing glow ring */}
+                    <span className="absolute inset-0 rounded-3xl animate-ping bg-green-500/10 pointer-events-none" style={{ animationDuration: '2s' }} />
+                    <div className="relative flex items-center gap-3 mb-2">
+                        <span className="relative flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" style={{ animationDuration: '1.5s' }} />
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-green-400" />
+                        </span>
+                        <h3 className="text-xl font-bold text-white">Open to Work</h3>
                     </div>
-                ))}
+                    <p className="text-sm font-mono text-slate-400">Hybrid / On-site Dublin</p>
+                </div>
             </div>
         </div>
     </section>
@@ -966,10 +1097,31 @@ const HomePage = () => (
     </>
 );
 
+const RepoSkeleton = () => (
+    <div className="animate-pulse p-6 rounded-2xl bg-[#020617] border border-slate-800 flex flex-col gap-3">
+        <div className="flex justify-between items-start">
+            <div className="h-5 bg-slate-700 rounded w-3/5" />
+            <div className="h-4 w-4 bg-slate-700 rounded" />
+        </div>
+        <div className="h-3 bg-slate-800 rounded w-full" />
+        <div className="h-3 bg-slate-800 rounded w-4/5" />
+        <div className="flex gap-3 mt-2">
+            <div className="h-3 bg-slate-700 rounded w-16" />
+            <div className="h-3 bg-slate-700 rounded w-10" />
+        </div>
+        <div className="flex gap-2 mt-1">
+            <div className="h-4 bg-slate-800 rounded w-14" />
+            <div className="h-4 bg-slate-800 rounded w-16" />
+            <div className="h-4 bg-slate-800 rounded w-12" />
+        </div>
+    </div>
+);
+
 const ProjectsPage = () => {
     const [githubRepos, setGithubRepos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [activeFilter, setActiveFilter] = useState('All');
 
     useEffect(() => {
         fetch('https://api.github.com/users/Ashiqurrahman9753/repos?sort=updated&per_page=30')
@@ -1062,14 +1214,32 @@ const ProjectsPage = () => {
 
                 {/* GitHub Repos - Live from API */}
                 <div>
-                    <h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+                    <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
                         <Github className="text-slate-400" size={24} /> GitHub Repositories
                     </h2>
 
+                    {/* Filter Pills */}
+                    {!loading && !error && githubRepos.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-8">
+                            {['All', ...Array.from(new Set(githubRepos.map(r => r.language).filter(Boolean)))].map(lang => (
+                                <button
+                                    key={lang}
+                                    onClick={() => setActiveFilter(lang)}
+                                    className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 ${
+                                        activeFilter === lang
+                                            ? 'bg-cyan-400 text-[#020617]'
+                                            : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700'
+                                    }`}
+                                >
+                                    {lang}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
                     {loading && (
-                        <div className="flex items-center justify-center py-20">
-                            <Loader2 className="text-cyan-400 animate-spin" size={40} />
-                            <span className="ml-4 text-slate-400 text-lg">Fetching repos from GitHub...</span>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {Array(6).fill(0).map((_, i) => <RepoSkeleton key={i} />)}
                         </div>
                     )}
 
@@ -1082,7 +1252,7 @@ const ProjectsPage = () => {
 
                     {!loading && !error && (
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {githubRepos.map((repo, idx) => (
+                            {githubRepos.filter(r => activeFilter === 'All' || r.language === activeFilter).map((repo, idx) => (
                                 <motion.a
                                     key={repo.id}
                                     href={repo.html_url}
@@ -1151,9 +1321,36 @@ const ProjectsPage = () => {
     );
 };
 
-const PublicationsPage = () => {
-    const [pdfPreview, setPdfPreview] = useState(null);
+// PDF Thumbnail Component
+const PDFThumbnail = ({ pdfUrl }) => {
+    const [numPages, setNumPages] = useState(null);
 
+    return (
+        <Document
+            file={pdfUrl}
+            onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+            loading={
+                <div className="w-full h-full flex items-center justify-center bg-slate-800">
+                    <Loader2 className="text-cyan-400 animate-spin" size={32} />
+                </div>
+            }
+            error={
+                <div className="w-full h-full flex items-center justify-center bg-slate-800 text-slate-500">
+                    <FileText size={48} />
+                </div>
+            }
+        >
+            <Page
+                pageNumber={1}
+                width={400}
+                renderTextLayer={false}
+                renderAnnotationLayer={false}
+            />
+        </Document>
+    );
+};
+
+const PublicationsPage = () => {
     return (
         <div className="pt-32 pb-16">
             <div className="max-w-7xl mx-auto px-6">
@@ -1165,159 +1362,167 @@ const PublicationsPage = () => {
                         Research <span className="text-cyan-400">Publications</span>
                     </h1>
                     <p className="text-xl text-slate-400 max-w-3xl">
-                        Academic research spanning machine learning, computer vision, IoT systems, and data analysis.
+                        Academic research spanning machine learning, computer vision, IoT systems, and data analysis. Click any paper to view on ResearchGate.
                     </p>
                 </div>
 
-                <div className="grid md:grid-cols-1 gap-8">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {publicationsData.map((paper, idx) => (
-                        <motion.div
+                        <motion.a
                             key={paper.id}
+                            href={paper.researchGateUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: idx * 0.1 }}
-                            className="group relative rounded-3xl bg-gradient-to-br from-slate-900 to-[#020617] border border-slate-800 hover:border-purple-500/50 overflow-hidden p-8 md:p-12 transition-all duration-300"
+                            whileHover={{ y: -8 }}
+                            className="group relative rounded-3xl bg-gradient-to-br from-slate-900 to-[#020617] border border-slate-800 hover:border-purple-500/50 overflow-hidden transition-all duration-300 cursor-pointer"
                         >
-                            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                            {/* PDF Thumbnail */}
+                            <div className="relative h-80 bg-slate-900 overflow-hidden">
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <PDFThumbnail pdfUrl={paper.pdfUrl} />
+                                </div>
 
-                            <div className="relative z-10">
-                                <div className="flex items-start justify-between mb-6">
-                                    <div className="flex-grow">
-                                        <div className="flex items-center gap-3 mb-4 flex-wrap">
-                                            <span className="px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-bold uppercase tracking-wide">
-                                                Research Paper
-                                            </span>
-                                            <span className="text-xs text-slate-500 font-mono">{paper.date}</span>
-                                        </div>
+                                {/* Gradient overlay at bottom */}
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-transparent to-transparent" />
 
-                                        <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 group-hover:text-purple-400 transition-colors leading-tight">
-                                            {paper.title}
-                                        </h3>
-
-                                        <p className="text-slate-400 mb-2">
-                                            <span className="font-semibold text-slate-300">Authors:</span> {paper.authors}
-                                        </p>
-                                        <p className="text-slate-400 mb-6">
-                                            <span className="font-semibold text-slate-300">Published:</span> {paper.conference}
-                                        </p>
-
-                                        <p className="text-slate-300 text-lg leading-relaxed mb-8">
-                                            {paper.abstract}
-                                        </p>
-
-                                        <div className="flex flex-wrap gap-2 mb-6">
-                                            {paper.tags.map((tag, i) => (
-                                                <span key={i} className="px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-md bg-slate-800 text-slate-300">
-                                                    {tag}
-                                                </span>
-                                            ))}
-                                        </div>
+                                {/* Hover overlay with "View on ResearchGate" */}
+                                <div className="absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                    <div className="text-center">
+                                        <ExternalLink className="text-cyan-400 mx-auto mb-3" size={48} />
+                                        <p className="text-white font-bold text-lg">View on ResearchGate</p>
+                                        <p className="text-slate-300 text-sm mt-2">Click to read the full paper</p>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div className="flex flex-wrap gap-4">
-                                    <button
-                                        onClick={() => setPdfPreview(paper)}
-                                        className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold transition-all group/btn"
-                                    >
-                                        <Eye size={18} className="group-hover/btn:scale-110 transition-transform" /> Preview PDF
-                                    </button>
-                                    <a
-                                        href={paper.pdfUrl}
-                                        download
-                                        className="inline-flex items-center gap-2 px-6 py-3 bg-slate-800 hover:bg-cyan-600 text-white rounded-xl font-bold transition-all"
-                                    >
-                                        <Download size={18} /> Download PDF
-                                    </a>
-                                    <a
-                                        href={paper.researchGateUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-all border border-slate-700"
-                                    >
-                                        <ExternalLink size={18} /> View on ResearchGate
-                                    </a>
+                            {/* Paper Info */}
+                            <div className="p-6">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <span className="px-2 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-[10px] font-bold uppercase tracking-wide">
+                                        Research Paper
+                                    </span>
+                                    <span className="text-[10px] text-slate-500 font-mono">{paper.date}</span>
+                                </div>
+
+                                <h3 className="text-lg font-bold text-white mb-3 group-hover:text-purple-400 transition-colors leading-tight line-clamp-2">
+                                    {paper.title}
+                                </h3>
+
+                                <p className="text-slate-400 text-sm mb-3 line-clamp-2">
+                                    {paper.abstract}
+                                </p>
+
+                                <div className="flex flex-wrap gap-1.5">
+                                    {paper.tags.slice(0, 3).map((tag, i) => (
+                                        <span key={i} className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md bg-slate-800 text-slate-300">
+                                            {tag}
+                                        </span>
+                                    ))}
+                                    {paper.tags.length > 3 && (
+                                        <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md bg-slate-800 text-slate-400">
+                                            +{paper.tags.length - 3}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
-                        </motion.div>
+                        </motion.a>
                     ))}
                 </div>
             </div>
+        </div>
+    );
+};
 
-            {/* PDF Preview Modal */}
-            <AnimatePresence>
-                {pdfPreview && (
-                    <>
-                        {/* Backdrop */}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setPdfPreview(null)}
-                            className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[100]"
-                        />
+const BlogPage = () => {
+    const iconMap = {
+        chart: <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center"><Megaphone className="text-white" size={28} /></div>,
+        brain: <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center"><BookOpen className="text-white" size={28} /></div>,
+        community: <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center"><HeartHandshake className="text-white" size={28} /></div>,
+        cloud: <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-yellow-500 flex items-center justify-center"><Server className="text-white" size={28} /></div>,
+    };
 
-                        {/* Modal */}
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            className="fixed inset-4 md:inset-8 z-[101] flex items-center justify-center"
+    const categoryColor = {
+        'Data Analysis': 'bg-cyan-900/30 border-cyan-500/30 text-cyan-300',
+        'Research': 'bg-purple-900/30 border-purple-500/30 text-purple-300',
+        'Community': 'bg-green-900/30 border-green-500/30 text-green-300',
+        'Technical': 'bg-orange-900/30 border-orange-500/30 text-orange-300',
+    };
+
+    return (
+        <div className="pt-32 pb-16">
+            <div className="max-w-5xl mx-auto px-6">
+                <div className="mb-16">
+                    <Link to="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-cyan-400 transition-colors mb-8">
+                        <ArrowRight size={20} className="rotate-180" /> Back to Home
+                    </Link>
+                    <div className="flex items-center gap-4 mb-4">
+                        <Rss className="text-cyan-400" size={36} />
+                        <h1 className="text-5xl md:text-6xl font-extrabold text-white tracking-tight">
+                            Blog & <span className="text-cyan-400">Articles</span>
+                        </h1>
+                    </div>
+                    <p className="text-xl text-slate-400 max-w-3xl">
+                        Thoughts on technology, research, data science, and community impact. Click any article to read the full piece.
+                    </p>
+                </div>
+
+                <div className="space-y-6">
+                    {blogData.map((post, idx) => (
+                        <motion.a
+                            key={post.id}
+                            href={post.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.08 }}
+                            whileHover={{ y: -4 }}
+                            className="group flex flex-col md:flex-row gap-6 p-8 rounded-3xl bg-gradient-to-br from-slate-900 to-[#020617] border border-slate-800 hover:border-cyan-500/40 transition-all duration-300 relative overflow-hidden"
                         >
-                            <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full h-full flex flex-col shadow-2xl">
-                                {/* Modal Header */}
-                                <div className="flex items-center justify-between p-6 border-b border-slate-700">
-                                    <div className="flex-grow pr-4">
-                                        <h3 className="text-xl font-bold text-white line-clamp-2">
-                                            {pdfPreview.title}
-                                        </h3>
-                                        <p className="text-sm text-slate-400 mt-1">{pdfPreview.date}</p>
-                                    </div>
-                                    <button
-                                        onClick={() => setPdfPreview(null)}
-                                        className="flex-shrink-0 p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
-                                    >
-                                        <X size={24} />
-                                    </button>
+                            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                            <div className="relative flex-shrink-0">
+                                {iconMap[post.icon]}
+                            </div>
+
+                            <div className="relative flex-grow">
+                                <div className="flex flex-wrap items-center gap-3 mb-3">
+                                    <span className={`px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wide ${categoryColor[post.category] || 'bg-slate-800 border-slate-700 text-slate-400'}`}>
+                                        {post.category}
+                                    </span>
+                                    <span className="flex items-center gap-1.5 text-xs text-slate-500 font-mono">
+                                        <Calendar size={12} /> {post.date}
+                                    </span>
                                 </div>
 
-                                {/* PDF Viewer */}
-                                <div className="flex-grow overflow-hidden">
-                                    <iframe
-                                        src={pdfPreview.pdfUrl}
-                                        className="w-full h-full"
-                                        title={pdfPreview.title}
-                                    />
-                                </div>
+                                <h3 className="text-xl md:text-2xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors leading-tight">
+                                    {post.title}
+                                </h3>
 
-                                {/* Modal Footer */}
-                                <div className="flex items-center justify-between p-6 border-t border-slate-700 bg-slate-900/50">
-                                    <p className="text-sm text-slate-400">
-                                        <span className="font-semibold text-slate-300">Tip:</span> Scroll to navigate through the paper
-                                    </p>
-                                    <div className="flex gap-3">
-                                        <a
-                                            href={pdfPreview.pdfUrl}
-                                            download
-                                            className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg font-bold text-sm transition-all"
-                                        >
-                                            <Download size={16} /> Download
-                                        </a>
-                                        <a
-                                            href={pdfPreview.researchGateUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-bold text-sm transition-all"
-                                        >
-                                            <ExternalLink size={16} /> ResearchGate
-                                        </a>
+                                <p className="text-slate-400 leading-relaxed mb-4 text-sm md:text-base">
+                                    {post.excerpt}
+                                </p>
+
+                                <div className="flex flex-wrap items-center gap-3">
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {post.tags.map((tag, i) => (
+                                            <span key={i} className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md bg-slate-800 text-slate-400">
+                                                {tag}
+                                            </span>
+                                        ))}
                                     </div>
+                                    <span className="ml-auto flex items-center gap-1.5 text-xs text-slate-500 group-hover:text-cyan-400 transition-colors font-semibold">
+                                        Read article <ExternalLink size={12} />
+                                    </span>
                                 </div>
                             </div>
-                        </motion.div>
-                    </>
-                )}
-            </AnimatePresence>
+                        </motion.a>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 };
@@ -1352,6 +1557,7 @@ function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/projects" element={<ProjectsPage />} />
                 <Route path="/publications" element={<PublicationsPage />} />
+                <Route path="/blog" element={<BlogPage />} />
             </Routes>
         </div>
     </div>
